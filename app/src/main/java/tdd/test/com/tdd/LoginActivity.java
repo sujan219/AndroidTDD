@@ -4,31 +4,20 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,9 +30,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
+import tdd.test.com.fetch.FetchFactory;
+import tdd.test.com.fetch.FetchListener;
+import tdd.test.com.fetch.FetchService;
+import tdd.test.com.fetch.IFetchStrategyClient;
 import tdd.test.com.validator.EmailValidator;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -60,7 +51,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     /**
      * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
@@ -79,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private EmailValidator emailValidator;
 
-    private ServiceConnection mServiceConnection;
+    private IFetchStrategyClient fetchStrategy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +79,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         emailValidator = new EmailValidator();
 
         mCounterTextView = (TextView) findViewById(R.id.counter);
-        mServiceConnection = new MyServiceConnection();
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -215,7 +204,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -306,7 +294,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 
     /**
@@ -325,8 +312,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
@@ -342,7 +327,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }
 
-            // TODO: register the new account here.
             return false;
         }
 
@@ -374,70 +358,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onStart();
         Intent intent = new Intent(this, FetchService.class);
         startService(intent);
-        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        fetchStrategy = FetchFactory.getFetchClient(this, intent);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Timer timer = new Timer();
-        HandlerThread handlerThread = new HandlerThread("handlerThread");
-        handlerThread.start();
-        Handler handler = new Handler(handlerThread.getLooper()) {
+        fetchStrategy.onRequest();
+        fetchStrategy.setFetchListener(new FetchListener() {
             @Override
-            public void handleMessage(Message msg) {
-                final int counter = msg.getData().getInt("counter");
-                LoginActivity.this.runOnUiThread(new Thread() {
-                    @Override
-                    public void run() {
-                        currentCounter = counter;
-                        Log.d("Testtesttesttest", counter + "");
-                        mCounterTextView.setText(counter + "");
-                    }
-                });
+            public void newData(int data) {
+                mCounterTextView.setText(data + "");
             }
-        };
-        final Messenger responseMessenger = new Messenger(handler);
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (mMessenger != null) {
-                    Message msg = Message.obtain(null, FetchService.MSG_TYPE_COUNTER);
-                    msg.replyTo = responseMessenger;
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("current", currentCounter);
-                    msg.setData(bundle);
-                    try {
-                        mMessenger.send(msg);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }, 1000, 1000);
+        });
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mMessenger != null) {
-            unbindService(mServiceConnection);
-        }
-    }
-
-    private Messenger mMessenger;
-    private int currentCounter;
-
-    private class MyServiceConnection implements ServiceConnection {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mMessenger = new Messenger(service);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mMessenger = null;
-        }
+        fetchStrategy.destroy();
     }
 }
