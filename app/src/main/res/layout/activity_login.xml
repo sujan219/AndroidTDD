@@ -72,6 +72,10 @@
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
+            <TextView android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/counter" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
