@@ -7,7 +7,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
-import static tdd.test.com.fetch.FetchService.MSG_TYPE_COUNTER;
+import static tdd.test.com.tdd.FetchService.MSG_TYPE_COUNTER;
 
 /**
  * Created by sujan on 1/13/2017.

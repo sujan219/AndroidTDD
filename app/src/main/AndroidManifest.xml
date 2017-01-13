@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"></activity>
-        <service android:name="tdd.test.com.fetch.FetchService"
+        <service android:name=".FetchService"
             android:enabled="true"
             android:process=":fetchProcess">
         </service>

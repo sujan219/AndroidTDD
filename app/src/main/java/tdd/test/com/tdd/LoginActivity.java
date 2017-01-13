@@ -33,7 +33,6 @@ import java.util.List;
 
 import tdd.test.com.fetch.FetchFactory;
 import tdd.test.com.fetch.FetchListener;
-import tdd.test.com.fetch.FetchService;
 import tdd.test.com.fetch.IFetchStrategyClient;
 import tdd.test.com.validator.EmailValidator;
 

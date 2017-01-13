@@ -1,6 +1,7 @@
 package tdd.test.com.fetch;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 /**
@@ -8,11 +9,11 @@ import android.content.Intent;
  */
 
 public class FetchFactory {
-    public static IFetchStrategyClient getFetchClient(Activity act, Intent intent){
-        return new MessengerFetchStrategyClient(act, intent);
+    public static IFetchStrategyClient getFetchClient(Context ctx, Intent intent){
+        return new BroadcastFetchStrategyClient(ctx);
     }
 
-    public static IFetchStrategyService getFetchService(){
-        return new MessengerFetchStrategyService();
+    public static IFetchStrategyService getFetchService(Context ctx){
+        return new BroadCastFetchStrategyService(ctx);
     }
 }

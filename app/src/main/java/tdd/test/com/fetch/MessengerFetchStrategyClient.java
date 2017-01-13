@@ -11,10 +11,11 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import tdd.test.com.tdd.FetchService;
 
 /**
  * Created by sujan on 1/13/2017.

@@ -1,4 +1,4 @@
-package tdd.test.com.fetch;
+package tdd.test.com.tdd;
 
 import android.app.Service;
 import android.content.Intent;
@@ -11,6 +11,9 @@ import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import tdd.test.com.fetch.FetchFactory;
+import tdd.test.com.fetch.IFetchStrategyService;
 
 /**
  * Created by sujan on 1/11/2017.
@@ -31,7 +34,7 @@ public class FetchService extends Service {
                 fetchStrategy.setData(fetchStrategy.getData()+1);
             }
         }, 3000, 3000);
-        fetchStrategy = FetchFactory.getFetchService();
+        fetchStrategy = FetchFactory.getFetchService(getBaseContext());
     }
 
     @Override
