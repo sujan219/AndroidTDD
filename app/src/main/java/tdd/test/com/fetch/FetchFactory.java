@@ -10,10 +10,10 @@ import android.content.Intent;
 
 public class FetchFactory {
     public static IFetchStrategyClient getFetchClient(Context ctx, Intent intent){
-        return new BroadcastFetchStrategyClient(ctx);
+        return new AIDLFetchStrategyClient(ctx, intent);
     }
 
     public static IFetchStrategyService getFetchService(Context ctx){
-        return new BroadCastFetchStrategyService(ctx);
+        return new AIDLFetchStrategyService();
     }
 }

@@ -26,7 +26,7 @@ public class BroadCastFetchStrategyService implements IFetchStrategyService {
 
     @Override
     public void setData(int data) {
-        mData = data;
+        mData = data+1;
         broadcast();
     }
 

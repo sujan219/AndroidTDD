@@ -366,8 +366,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         fetchStrategy.onRequest();
         fetchStrategy.setFetchListener(new FetchListener() {
             @Override
-            public void newData(int data) {
-                mCounterTextView.setText(data + "");
+            public void newData(final int data) {
+                LoginActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCounterTextView.setText(data + "");
+                    }
+                });
             }
         });
     }
